@@ -43,7 +43,7 @@ void crop(IplImage* src, IplImage* dest, CvRect rect)
 double medianIplImage(IplImage* pSrc, int32_t nVals)
 {
     // COMPUTE HISTOGRAM OF SINGLE CHANNEL MATRIX
-    float range[] = { 0, nVals };
+    float range[] = { 0, (float)nVals };
     const float* histRange = { range };
     bool uniform = true;
     bool accumulate = false;
@@ -84,7 +84,7 @@ void myprintf(int nRow, int nCol, const char *pFmt, ...)
     va_list args;
     va_start (args, pFmt);
 
-    sprintf(szCode, "\\033[%d;%dH\\033[K\\033[%d;%dH", nRow, nCol, nRow, nCol);
+    sprintf(szCode, "\033[%d;%dH\033[K\033[%d;%dH", nRow, nCol, nRow, nCol);
     printf("%s", szCode);
 
     vprintf(pFmt, args);
