@@ -1,0 +1,17 @@
+uint32 nNewLeftDirection
+uint32 nNewLeftSpeed
+uint32 nNewRightDirection
+uint32 nNewRightSpeed
+---
+uint32 nLastLeftDirection
+uint32 nLastLeftSpeed
+uint32 nLastRightDirection
+uint32 nLastRightSpeed
+
+uint32 nNewLeftDirection
+uint32 nNewLeftSpeed
+
+uint32 nNewRightDirection
+uint32 nNewRightSpeed
+
+int32 nRetCode

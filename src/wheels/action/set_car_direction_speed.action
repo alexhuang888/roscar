@@ -1,0 +1,13 @@
+#define the goal
+uint32 nNewDirection
+uint32 nNewSpeed
+---
+#define the result
+uint32 nLastDirection
+uint32 nLastSpeed
+int32 nRetCode
+---
+#define the feedback message
+uint32 nCurrentDirection
+uint32 nCurrentSpeed
+int32 nRetCode

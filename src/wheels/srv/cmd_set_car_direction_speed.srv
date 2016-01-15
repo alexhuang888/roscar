@@ -1,0 +1,8 @@
+uint32 nNewDirection
+uint32 nNewSpeed
+---
+uint32 nLastDirection
+uint32 nLastSpeed
+uint32 nNewDirection
+uint32 nNewSpeed
+int32 nRetCode

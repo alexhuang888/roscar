@@ -1,0 +1,8 @@
+uint32 nNewEngineID
+string strNewEngineDescription
+---
+uint32 nLastEngineID
+string strLastEngineDescription
+uint32 nActiveEngineID
+string strActiveEngineDescription
+int32 nRetCode

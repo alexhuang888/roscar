@@ -1,0 +1,4 @@
+uint32 nModeFlags
+string strNewImageFilename
+---
+int32 nRetCode

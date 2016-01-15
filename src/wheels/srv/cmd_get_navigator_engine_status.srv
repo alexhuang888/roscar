@@ -1,0 +1,4 @@
+---
+uint32 nActiveEngineID
+string strActiveEngineDescription
+int32 nRetCode

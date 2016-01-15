@@ -1,0 +1,6 @@
+uint32 nWheelID
+---
+uint32 nWheelDirection
+uint32 nWheelSpeed
+uint32 nWheelHealthStatus
+int32 nRetCode
