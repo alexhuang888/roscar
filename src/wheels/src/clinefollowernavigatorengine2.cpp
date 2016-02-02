@@ -3,8 +3,8 @@
 #include "myutil.h"
 #include <opencv2/highgui/highgui.hpp>
 #include "GRANSAC.hpp"
-#include "myutil.h"
 
+#define _THISFILE_LINENO _APPLINENO_2
 namespace yisys_roswheels
 {
 #define _CL2_SHOWDEBUGMSG 0
@@ -71,7 +71,7 @@ int32_t CLineFollowerNavigatorEngine2::Pause(void)
 void CLineFollowerNavigatorEngine2::ProcessLanes(CvSeq* lines, IplImage* pEdges, IplImage *pWorkingImage, bool bShowHoughLine, float fLastSlope, float fLastB)
 {
 #if _CL2_SHOWDEBUGMSG
-    myprintf(3, 1, "Found hough lines: %d\n", lines->total);
+    myprintf(_THISFILE_LINENO, 1, "Found hough lines: %d\n", lines->total);
 #endif
     if (lines->total <= 0)
     {
@@ -93,7 +93,7 @@ void CLineFollowerNavigatorEngine2::ProcessLanes(CvSeq* lines, IplImage* pEdges,
             {
                 cvLine(pWorkingImage, line[0], line[1], CV_RGB(0, 0, 255), 2);
             }
-            myprintf(4, 1, "*turn angle:%f, (%d, %d)\n", m_fTurnAngle, m_VanishingPoint.x, m_VanishingPoint.y);
+            myprintf(_THISFILE_LINENO, 1, "*turn angle:%f, (%d, %d)\n", m_fTurnAngle, m_VanishingPoint.x, m_VanishingPoint.y);
         }
         return;
     }
@@ -119,7 +119,7 @@ void CLineFollowerNavigatorEngine2::ProcessLanes(CvSeq* lines, IplImage* pEdges,
                     cvLine(pWorkingImage, line[0], line[1], CV_RGB(0, 255, 0), 3);
                 }
 #if _CL2_SHOWDEBUGMSG
-            myprintf(5, 1, "HoughLine: ang=%f, len=%f, m=%f, b=%f (%d, %d), (%d, %d)\n", checkLine->m_fAngle, checkLine->m_fLength, checkLine->m_Slope, checkLine->m_B, checkLine->m_Point1.x, checkLine->m_Point1.y, checkLine->m_Point2.x, checkLine->m_Point2.y);
+            myprintf(_THISFILE_LINENO, 1, "HoughLine: ang=%f, len=%f, m=%f, b=%f (%d, %d), (%d, %d)\n", checkLine->m_fAngle, checkLine->m_fLength, checkLine->m_Slope, checkLine->m_B, checkLine->m_Point1.x, checkLine->m_Point1.y, checkLine->m_Point2.x, checkLine->m_Point2.y);
 #endif
             }
             else
@@ -129,13 +129,13 @@ void CLineFollowerNavigatorEngine2::ProcessLanes(CvSeq* lines, IplImage* pEdges,
                     cvLine(pWorkingImage, line[0], line[1], CV_RGB(0, 0, 0), 3);
                 }
 #if _CL2_SHOWDEBUGMSG
-            myprintf(5, 1, "*HoughLine: ang=%f, len=%f, m=%f, b=%f (%d, %d), (%d, %d)\n", checkLine->m_fAngle, checkLine->m_fLength, checkLine->m_Slope, checkLine->m_B, checkLine->m_Point1.x, checkLine->m_Point1.y, checkLine->m_Point2.x, checkLine->m_Point2.y);
+            myprintf(_THISFILE_LINENO, 1, "*HoughLine: ang=%f, len=%f, m=%f, b=%f (%d, %d), (%d, %d)\n", checkLine->m_fAngle, checkLine->m_fLength, checkLine->m_Slope, checkLine->m_B, checkLine->m_Point1.x, checkLine->m_Point1.y, checkLine->m_Point2.x, checkLine->m_Point2.y);
 #endif
             }
 
         }
 #if _CL2_SHOWDEBUGMSG
-        myprintf(6, 1, "Total Candidate line before RANSAC:%zu\n", CandLines.size());
+        myprintf(_THISFILE_LINENO + 1, 1, "Total Candidate line before RANSAC:%zu\n", CandLines.size());
 #endif
         Estimator.Initialize(10, 100); // Threshold, iterations
         Estimator.Estimate(CandLines);
@@ -151,7 +151,7 @@ void CLineFollowerNavigatorEngine2::ProcessLanes(CvSeq* lines, IplImage* pEdges,
                 int nVYMin = m_ROIFrameSize.height;
                 int nVYMax = 0;
 #if _CL2_SHOWDEBUGMSG
-                myprintf(7, 1, "Total inliner: %zu\n", BestInliers.size());
+                myprintf(_THISFILE_LINENO + 1, 1, "Total inliner: %zu\n", BestInliers.size());
 #endif
                 // here, we found several line with similar slope.
                 // from those lines, we need to get vanishing point and turn angle
@@ -175,7 +175,7 @@ void CLineFollowerNavigatorEngine2::ProcessLanes(CvSeq* lines, IplImage* pEdges,
                         cvLine(pWorkingImage, RPt->m_Point1, RPt->m_Point2, CV_RGB(0, 0, 255), 1);
                     }
 #if _CL2_SHOWDEBUGMSG
-                    myprintf(8, 1, "Inliner: ang:%f, m=%f, b=%f, (%d, %d)(%d, %d)\n", RPt->m_fAngle, RPt->m_Slope, RPt->m_B, RPt->m_Point1.x, RPt->m_Point1.y, RPt->m_Point2.x, RPt->m_Point2.y);
+                    myprintf(_THISFILE_LINENO+1, 1, "Inliner: ang:%f, m=%f, b=%f, (%d, %d)(%d, %d)\n", RPt->m_fAngle, RPt->m_Slope, RPt->m_B, RPt->m_Point1.x, RPt->m_Point1.y, RPt->m_Point2.x, RPt->m_Point2.y);
 #endif
                     nTotalCounts++;
                 }
@@ -189,7 +189,7 @@ void CLineFollowerNavigatorEngine2::ProcessLanes(CvSeq* lines, IplImage* pEdges,
                 {
                     std::shared_ptr<yisys_roswheels::MyLine2D> param = std::dynamic_pointer_cast<MyLine2D>(*itparam);
 #if _CL2_SHOWDEBUGMSG
-                    myprintf(9, 1, "model: ang=%f, m=%f, b=%f, (%d, %d) (%d, %d)\n", param->m_fAngle, param->m_Slope, param->m_B, param->m_Point1.x, param->m_Point1.y, param->m_Point2.x, param->m_Point2.y);
+                    myprintf(_THISFILE_LINENO+1, 1, "model: ang=%f, m=%f, b=%f, (%d, %d) (%d, %d)\n", param->m_fAngle, param->m_Slope, param->m_B, param->m_Point1.x, param->m_Point1.y, param->m_Point2.x, param->m_Point2.y);
 #endif
                     m_fTurnAngle += param->m_fAngle;
 
@@ -220,7 +220,7 @@ void CLineFollowerNavigatorEngine2::ProcessLanes(CvSeq* lines, IplImage* pEdges,
                 // average of inliners and shift-angle
                 float fFinalAngle = (m_fTurnAngle + dShiftAngle) / 2;
 #if 1
-                myprintf(10, 1, "proposed angle:%f, shift-angle=%f, lineangle=%f, (%d, %d)\n", fFinalAngle, dShiftAngle, m_fTurnAngle, m_VanishingPoint.x, m_VanishingPoint.y);
+                myprintf(_THISFILE_LINENO+1, 1, "proposed angle:%f, shift-angle=%f, lineangle=%f, (%d, %d)\n", fFinalAngle, dShiftAngle, m_fTurnAngle, m_VanishingPoint.x, m_VanishingPoint.y);
 #endif
                 m_fTurnAngle = fFinalAngle;
                 if (bShowHoughLine)
@@ -258,10 +258,10 @@ int32_t CLineFollowerNavigatorEngine2::ProcessImage(IplImage *pFrame, bool bDisp
         try {
             cvSaveImage(m_strFilePath.c_str(), pFrame);
             m_bToSaveImage = false;
-            myprintf(12, 1, "Image saved to %s\n", m_strFilePath.c_str());
+            myprintf(_INFOLINENO, 1, "Image saved to %s\n", m_strFilePath.c_str());
         } catch(...)
         {
-        printf("Image Failed to be saved to %s\n", m_strFilePath.c_str());
+        	myprintf(_ERRORLINENO, 1, "Image Failed to be saved to %s\n", m_strFilePath.c_str());
         }
     }
 #define ROIRATIO 2

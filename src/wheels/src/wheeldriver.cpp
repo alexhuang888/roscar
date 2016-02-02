@@ -11,6 +11,9 @@
 #include "clanedetectornavigatorengine.h"
 #include "globalinc.h"
 #include "myutil.h"
+
+#define _THISFILE_LINENO _APPLINENO_1
+#define _THISINFO_BLOCKLINENO _APPLINENO_5
 namespace yisys_roswheels
 {
 CWheelDriver::CWheelDriver(std::string nodename) :
@@ -42,8 +45,8 @@ CWheelDriver::CWheelDriver(std::string nodename) :
     _ResetPIDParams();
 
 	m_fKp = WHEELPIDMAXSPEED;
-	m_fKi = -0.0001f;
-	m_fKd = -m_fKp / 2;
+	m_fKi = 0.0001f;
+	m_fKd = m_fKp / 2;
 	m_fRightWheelAdjustRatio = RIGHTWHEELADJUSTRATIO;
 	m_nFileSaveCounter = 0;
 }
@@ -144,7 +147,7 @@ int32_t CWheelDriver::_SetSpeedDirection(int32_t nSpeed, int32_t nDirection)
 	}
 	else
 	{
-		ROS_ERROR("Failed to call service set_direction_speed");
+		myprintf(_ERRORLINENO, 1, "Failed to call service set_direction_speed");
 	}
 #endif
 err_out:
@@ -157,7 +160,7 @@ void CWheelDriver::Checklongpause(void)
 	if (difftime(now, m_LastMsgTime) > LONGCMDVELSPAUSE && m_bCarStopped == false)
 	{
 		//_SetSpeedDirection(0, WCLR_STOP);
-		ROS_INFO("Does not receive nagivator cmd_vels for over %d seconds. Stop the car.", LONGCMDVELSPAUSE);
+		myprintf(_ERRORLINENO, 1, "Does not receive nagivator cmd_vels for over %d seconds. Stop the car.", LONGCMDVELSPAUSE);
 		// we have to deal with something
 		// 1. pause the car
 		// 2. clear accumulated error
@@ -259,7 +262,7 @@ int32_t CWheelDriver::CmdVelToWheelController(float fAngular, float fLinear)
 	srv2.request.nNewRightSpeed = nNewRightSpeed;
 	srv2.request.nNewRightDirection = nNewRightDirection;
 
-	myprintf(18, 1, "Set wheel speed (%f, %f, %f, %f) Left(%f, %d), right(%f, %d)\n", fAngular, nNewSpeed, fErrorDiff, m_fAccumulatedShiftError, nNewLeftSpeed, nNewLeftDirection, nNewRightSpeed, nNewRightDirection);
+	myprintf(_THISFILE_LINENO, 1, "Set wheel speed (%f, %f, %f, %f) Left(%f, %d), right(%f, %d)\n", fAngular, nNewSpeed, fErrorDiff, m_fAccumulatedShiftError, nNewLeftSpeed, nNewLeftDirection, nNewRightSpeed, nNewRightDirection);
 	if (m_SetTwoWheelsSpeedClient.call(srv2))
 	{
 		if (srv2.response.nNewLeftSpeed == 0 && srv2.response.nNewRightSpeed == 0)
@@ -270,7 +273,7 @@ int32_t CWheelDriver::CmdVelToWheelController(float fAngular, float fLinear)
 	}
 	else
 	{
-		ROS_ERROR("Failed to call service set_two_wheels_direction_speed");
+		myprintf(_ERRORLINENO, 1, "Failed to call service set_two_wheels_direction_speed");
 	}
 err_out:
 
@@ -303,7 +306,7 @@ int32_t CWheelDriver::KeyCodeToWheelController(unsigned char nInput)
 			{
                 _ResetPIDParams();
 				m_bManualStop = false;
-				ROS_INFO("UnBlock all incoming cmd_vels.");
+				myprintf(_THISINFO_BLOCKLINENO, 1, "UnBlock all incoming cmd_vels.");
 			}
 			break;
 		case 'o':
@@ -314,7 +317,7 @@ int32_t CWheelDriver::KeyCodeToWheelController(unsigned char nInput)
 				nNewDirection = WCLR_STOP;
 				nRet = _SetSpeedDirection(nNewSpeed, nNewDirection);
 				m_bManualStop = true;
-				ROS_INFO("Force to stop. Block all incoming cmd_vels.");
+				myprintf(_THISINFO_BLOCKLINENO, 1, "Force to stop. Block all incoming cmd_vels.");
 			}
 			break;
 		case 'p':
@@ -398,36 +401,36 @@ int32_t CWheelDriver::KeyCodeToWheelController(unsigned char nInput)
 			wheels::cmd_get_navigator_engine_status engsrv;
 
 			GetWheelStatus(CMC_LEFTWHEELID, srv);
-			ROS_INFO("WheelID[%d] Ret=%d: dir=%d, speed=%d, health=%d", CMC_LEFTWHEELID, srv.response.nRetCode, srv.response.nWheelDirection, srv.response.nWheelSpeed, srv.response.nWheelHealthStatus);
+			myprintf(_THISINFO_BLOCKLINENO, 1, "WheelID[%d] Ret=%d: dir=%d, speed=%d, health=%d", CMC_LEFTWHEELID, srv.response.nRetCode, srv.response.nWheelDirection, srv.response.nWheelSpeed, srv.response.nWheelHealthStatus);
 
 			GetWheelStatus(CMC_RIGHTWHEELID, srv);
-			ROS_INFO("WheelID[%d] Ret=%d: dir=%d, speed=%d, health=%d", CMC_RIGHTWHEELID, srv.response.nRetCode, srv.response.nWheelDirection, srv.response.nWheelSpeed, srv.response.nWheelHealthStatus);
+			myprintf(_THISINFO_BLOCKLINENO+1, 1, "WheelID[%d] Ret=%d: dir=%d, speed=%d, health=%d", CMC_RIGHTWHEELID, srv.response.nRetCode, srv.response.nWheelDirection, srv.response.nWheelSpeed, srv.response.nWheelHealthStatus);
 			if (m_GetNavigatorEngineStatusClient.call(engsrv))
 			{
-				ROS_INFO("Active Navigator Engine, ID=%d [%s]", engsrv.response.nActiveEngineID, engsrv.response.strActiveEngineDescription.c_str());
+				myprintf(_THISINFO_BLOCKLINENO+2, 1, "Active Navigator Engine, ID=%d [%s]", engsrv.response.nActiveEngineID, engsrv.response.strActiveEngineDescription.c_str());
 			}
 			else
 			{
-				ROS_INFO("Fail to query navigator engine status");
+				myprintf(_THISINFO_BLOCKLINENO+2, 1, "Fail to query navigator engine status");
 			}
-			ROS_INFO("Current User Direction=%d, Current User Speed=%d", m_nCurrentUserDirection, m_nCurrentUserSpeed);
+			myprintf(_THISINFO_BLOCKLINENO+3, 1, "Current User Direction=%d, Current User Speed=%d", m_nCurrentUserDirection, m_nCurrentUserSpeed);
 			if (m_bManualStop)
 			{
-				ROS_INFO("Manual stop is on");
+				myprintf(_THISINFO_BLOCKLINENO+4, 1, "Manual stop is on");
 			}
 			else
 			{
-				ROS_INFO("Manual stop is off");
+				myprintf(_THISINFO_BLOCKLINENO+4, 1, "Manual stop is off");
 			}
 			if (m_bDisplayDebugImage)
 			{
-				ROS_INFO("Debug image is on");
+				myprintf(_THISINFO_BLOCKLINENO+5, 1, "Debug image is on");
 			}
 			else
 			{
-				ROS_INFO("Debug image is off");
+				myprintf(_THISINFO_BLOCKLINENO+5, 1, "Debug image is off");
 			}
-			ROS_INFO("Right Wheel adjustment ratio=%f\n", m_fRightWheelAdjustRatio);
+			myprintf(_THISINFO_BLOCKLINENO+6, 1, "Right Wheel adjustment ratio=%f\n", m_fRightWheelAdjustRatio);
 			break;
 		}
 		case '.':	// right wheel ratio + 0.01
@@ -461,7 +464,7 @@ int32_t CWheelDriver::KeyCodeToWheelController(unsigned char nInput)
 			}
 			else
 			{
-				ROS_INFO("Fail to set navigator engine");
+				myprintf(_ERRORLINENO, 1, "Fail to set navigator engine");
 			}
 
 		}
@@ -476,12 +479,12 @@ int32_t CWheelDriver::KeyCodeToWheelController(unsigned char nInput)
                 _ResetPIDParams();
 				if (engset.response.nRetCode <= 0)
 				{
-					ROS_INFO("fail to set Line follower engine");
+					myprintf(_ERRORLINENO, 1, "fail to set Line follower engine");
 				}
 			}
 			else
 			{
-				ROS_INFO("Fail to set navigator engine");
+				myprintf(_ERRORLINENO, 1, "Fail to set navigator engine");
 			}
 		}
 			break;
@@ -495,12 +498,12 @@ int32_t CWheelDriver::KeyCodeToWheelController(unsigned char nInput)
                 _ResetPIDParams();
 				if (engset.response.nRetCode <= 0)
 				{
-					ROS_INFO("fail to set lane detector engine");
+					myprintf(_ERRORLINENO, 1, "fail to set lane detector engine");
 				}
 			}
 			else
 			{
-				ROS_INFO("Fail to set navigator engine");
+				myprintf(_ERRORLINENO, 1, "Fail to set navigator engine");
 			}
 
 		}
@@ -515,12 +518,12 @@ int32_t CWheelDriver::KeyCodeToWheelController(unsigned char nInput)
                 _ResetPIDParams();
 				if (engset.response.nRetCode <= 0)
 				{
-					ROS_INFO("fail to set Line follower engine2");
+					myprintf(_ERRORLINENO, 1, "fail to set Line follower engine2");
 				}
 			}
 			else
 			{
-				ROS_INFO("Fail to set navigator engine2");
+				myprintf(_ERRORLINENO, 1, "Fail to set navigator engine2");
 			}
 		}
 			break;
@@ -538,23 +541,27 @@ int32_t CWheelDriver::KeyCodeToWheelController(unsigned char nInput)
 			{
 				if (engsave.response.nRetCode <= 0)
 				{
-					ROS_INFO("fail to save image");
+					myprintf(_ERRORLINENO, 1, "fail to save image");
 				}
 			}
 			else
 			{
-				ROS_INFO("Fail to set navigator engine");
+				myprintf(_ERRORLINENO, 1, "Fail to set navigator engine");
 			}
 			break;
 		}
 		case 'h':
-			myprintf(19, 1, "Input instruction (0: disable all navigator engine, 1: line-follower, 2: lane-detector, o: manual stop, k: manual restart, u: forward, d: backward, l: left, r: right, w: right-backward, z: left-backward, p: stop, i: wheel status\n");
+			//myprintf(19, 1, "Input instruction (0: disable all navigator engine, 1: line-follower, 2: lane-detector, o: manual stop, k: manual restart, u: forward, d: backward, l: left, r: right, w: right-backward, z: left-backward, p: stop, i: wheel status\n");
+			PrintHelpInfo();
 			break;
 	}
 
 	return nRet;
 }
-
+void CWheelDriver::PrintHelpInfo(void)
+{
+	myprintf(_THISINFO_BLOCKLINENO+7, 1, "Input instruction (0: disable all navigator engine, 1: line-follower, 2: lane-detector, o: manual stop, k: manual restart, u: forward, d: backward, l: left, r: right, w: right-backward, z: left-backward, p: stop, i: wheel status\n");
+}
 int32_t CWheelDriver::GetWheelStatus(uint32_t nWheelID, wheels::cmd_get_one_wheel_status &Status)
 {
 	int32_t nRet = 0;
@@ -568,7 +575,7 @@ int32_t CWheelDriver::GetWheelStatus(uint32_t nWheelID, wheels::cmd_get_one_whee
 	}
 	else
 	{
-		ROS_ERROR("Failed to call service get_one_wheel_status");
+		myprintf(_ERRORLINENO, 1, "Failed to call service get_one_wheel_status");
 	}
 	return nRet;
 }

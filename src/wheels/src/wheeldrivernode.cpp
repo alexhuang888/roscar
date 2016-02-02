@@ -1,5 +1,5 @@
 #include "ros/ros.h"
-
+#include "myutil.h"
 #include "wheeldriver.h"
 
 int main(int argc, char **argv)
@@ -8,8 +8,10 @@ int main(int argc, char **argv)
 
 	yisys_roswheels::CWheelDriver WheelDriver(ros::this_node::getName());
 	uint32_t nInput = 0;
-	
-	ros::spin();
 
+	myclearscreen();
+	WheelDriver.PrintHelpInfo();
+	ros::spin();
+	myclearscreen();
 	return 1;
 }

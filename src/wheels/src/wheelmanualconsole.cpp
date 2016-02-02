@@ -2,7 +2,7 @@
 #include <sstream>
 #include <termios.h>
 #include "wheeldriver.h"
-
+#include "myutil.h"
 int mygetch (void)
 {
   int ch;
@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 		
 		if (sendinstClient.call(srv) == false)
 		{
-			printf("Fail to send manual instruction\n");
+			myprintf(_ERROR_LINENO, 1, "Fail to send manual instruction\n");
 		}
 	}
   return 0;

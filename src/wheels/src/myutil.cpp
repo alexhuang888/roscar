@@ -81,13 +81,16 @@ void myclearscreen(void)
 void myprintf(int nRow, int nCol, const char *pFmt, ...)
 {
     char szCode[100];
+    char szAll[512];
     va_list args;
-    va_start (args, pFmt);
+    va_start(args, pFmt);
 
     sprintf(szCode, "\033[%d;%dH\033[K\033[%d;%dH", nRow, nCol, nRow, nCol);
     printf("%s", szCode);
 
-    vprintf(pFmt, args);
+    //vprintf(pFmt, args);
+    vsprintf(szAll, pFmt, args);
+    printf("%s%s", szCode, szAll);
     va_end(args);
 }
 

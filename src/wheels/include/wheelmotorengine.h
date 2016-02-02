@@ -89,5 +89,6 @@ protected:
 	map<int32_t, CL298NMotorController*> m_Motors;
 	uint32_t m_nDirection;	// 
 	uint32_t m_nSpeed;	// 0 - 100
+	bool m_bInited;	// 
 };
 }

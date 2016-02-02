@@ -4,7 +4,7 @@
 #include<opencv2/highgui/highgui.hpp>
 #include "clinefollowernavigatorengine.h"
 #include "myutil.h"
-
+#define _THISFILE_LINENO _APPLINENO_2
 namespace yisys_roswheels
 {
 CLineFollowerNavigatorEngine::CLineFollowerNavigatorEngine()
@@ -79,14 +79,14 @@ int32_t CLineFollowerNavigatorEngine::ProcessImage(IplImage *pFrame, bool bDispl
 	nRet = FindOffset(nCenterX, nCenterY, fOffsetX, fOffsetY);
 	if (nRet <= 0)
 	{
-		printf("Fail to find offset\n");
+		myprintf(_ERRORLINENO, 1, "Fail to find offset\n");
 		goto err_out;
 	}
 
 	nRet = OffsetNavigator(fOffsetX, fAngle, vanishingPoint);
 	if (nRet <= 0)
 	{
-		printf("Fail to OffsetNavigator\n");
+		myprintf(_ERRORLINENO, 1, "Fail to OffsetNavigator\n");
 		goto err_out;
 	}
 err_out:
@@ -154,7 +154,7 @@ int32_t CLineFollowerNavigatorEngine::FindLineCenter(cv::Mat &InputImage, int32_
 		}
 		catch (...)
 		{
-			printf("Fail to threhold image\n");
+			myprintf(_ERRORLINENO, 1, "Fail to threhold image\n");
 		}
 #endif
 #if TESTROI
@@ -178,7 +178,7 @@ int32_t CLineFollowerNavigatorEngine::FindLineCenter(cv::Mat &InputImage, int32_
 			cv::findContours(roiImg, contours, hierarchy, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cv::Point(0,0));
 		} catch (...)
 		{
-			printf("Fail to findContours\n");
+			myprintf(_ERRORLINENO, 1, "Fail to findContours\n");
 		}
 		int nMaxAreaContourIndex = -1;
 		float fMaxArea = 0.f;
@@ -192,7 +192,7 @@ int32_t CLineFollowerNavigatorEngine::FindLineCenter(cv::Mat &InputImage, int32_
 				fMaxArea = fArea;
 			}
 		}
-		myprintf(3, 1, "Found Max Area=%f, area threshold=%d (total contour=%d)\n", fMaxArea, ContourAreaThreshold, contours.size());
+		myprintf(_THISFILE_LINENO, 1, "Found Max Area=%f, area threshold=%d (total contour=%d)\n", fMaxArea, ContourAreaThreshold, contours.size());
 		{
 			if (fMaxArea > ContourAreaThreshold && nMaxAreaContourIndex >= 0)
 			{
@@ -201,7 +201,7 @@ int32_t CLineFollowerNavigatorEngine::FindLineCenter(cv::Mat &InputImage, int32_
 					mu = cv::moments(contours[nMaxAreaContourIndex], false);
 				} catch (...)
 				{
-					printf("Fail to find moments\n");
+					myprintf(_ERRORLINENO, 1, "Fail to find moments\n");
 				}
 				cv::Point2f center(mu.m10 / mu.m00, mu.m01 / mu.m00); // point in center (x only)
 				//printf("Find a region: Area=%f, center(%f, %f)\n", fMaxArea, center.x, center.y);

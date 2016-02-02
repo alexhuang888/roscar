@@ -23,6 +23,7 @@ class CWheelDriver
 public:
 	CWheelDriver(std::string nodename);
 	virtual ~CWheelDriver() {};
+	void PrintHelpInfo(void);
 	void wheels_CmdVelCallback(const geometry_msgs::Twist::ConstPtr& msg);
 	bool cbSendManualInstruction(wheels::cmd_send_manual_instructionRequest &req,
 								wheels::cmd_send_manual_instructionResponse &res);

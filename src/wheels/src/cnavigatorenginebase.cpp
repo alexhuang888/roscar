@@ -11,6 +11,7 @@
 #include "globalinc.h"
 #include "myutil.h"
 
+#define _THISFILE_LINENO _APPLINENO_2
 using namespace cv;
 namespace yisys_roswheels
 {
@@ -29,7 +30,7 @@ CNavigatorEngineWithImageSource::CNavigatorEngineWithImageSource()
 {
 	// subscribe
 	m_strVidChannel = m_nImageBaseNodeHandle.resolveName("image");
-	printf("Resolve name for image=%s\n", m_strVidChannel.c_str());
+	myprintf(_ERRORLINENO, 1, "Resolve name for image=%s\n", m_strVidChannel.c_str());
 
 	m_VidSubscriber = m_nImageBaseNodeHandle.subscribe(m_strVidChannel, 1, &CNavigatorEngineWithImageSource::vidCb, this);
 
@@ -152,7 +153,7 @@ int32_t CNavigatorEngineWithImageSource::ProcessImageData(const sensor_msgs::Ima
 
 	if (nRet <= 0)
 	{
-		printf("Fail to ProcessImage\n");
+		myprintf(_ERRORLINENO, 1, "Fail to ProcessImage\n");
 		goto err_out;
 	}
 	//printf("Lane center: fAngle=%f, center(%d, %d)\n", fAngle, vanishPoint.x, vanishPoint.y);
@@ -162,7 +163,7 @@ int32_t CNavigatorEngineWithImageSource::ProcessImageData(const sensor_msgs::Ima
 #define DIVRANGE 6.f
 
 	fAngleRatio = ((int32_t)(fAngleRatio * DIVRANGE)) / DIVRANGE;
-	printf("adjust angle=%f\n", fAngleRatio);
+	myprintf(_ERRORLINENO, 1, "adjust angle=%f\n", fAngleRatio);
 #endif
 	vel_msg.angular.z = (fAngleRatio);
 	vel_msg.linear.x = _CNEWIS_DEFAULT_LINEARSPEED;
@@ -239,7 +240,7 @@ void CNavigatorEngineWithImageSource::vidCb(const sensor_msgs::ImageConstPtr img
         int64_t nThisTick = cv::getTickCount();
         double dSecond = (double)(nThisTick - m_nLastTickCount) / (double)cv::getTickFrequency();
         m_nFrameProcessedCount++;
-        myprintf(2, 1, "Frame rate: %f (%d, %f)\n", m_nFrameProcessedCount / dSecond, m_nFrameProcessedCount, dSecond);
+        myprintf(_APPLINENO_4, 1, "Frame rate: %f (%d, %f)", m_nFrameProcessedCount / dSecond, m_nFrameProcessedCount, dSecond);
 	}
 #endif
 }

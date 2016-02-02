@@ -20,4 +20,17 @@ double medianIplImage(IplImage* src, int32_t nVals);
 
 void myprintf(int nRow, int nCol, const char *pFmt, ...);
 void myclearscreen(void);
+
+
+#define _APPLINENO_0 3
+#define _APPLINENO_1 5
+#define _APPLINENO_2 7
+#define _APPLINENO_3 9
+// here is for main app use
+#define _APPLINENO_4 13
+#define _APPLINENO_5 17
+#define _ERROR_LINENO 25
+#define _ERRORLINENO _ERROR_LINENO
+#define _INFOLINENO 21
+
 #endif

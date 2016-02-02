@@ -10,7 +10,7 @@
 #include <omp.h>
 
 #include "AbstractModel.hpp"
-
+#include "myutil.h"
 namespace GRANSAC
 {
     typedef std::vector<std::shared_ptr<AbstractParameter>> InlinerListType;
@@ -72,7 +72,7 @@ namespace GRANSAC
 	{
 	    if (Data.size() <= t_NumParams)
 	    {
-            std::cout << "[ WARN ]: RANSAC - Number of data points is too less. Not doing anything." << std::endl;
+            myprintf(_ERROR_LINENO, 1, "[ WARN ]: RANSAC - Number of data points is too less. Not doing anything.\n");
             return false;
 	    }
 

@@ -1,6 +1,7 @@
 
 #include "wheelstatusconsole.h"
-
+#include "myutil.h"
+#define _THISFILELINNO _INFOLINENO
 namespace yisys_roswheels
 {
 	CWheelStatusConsole::CWheelStatusConsole()
@@ -22,7 +23,7 @@ namespace yisys_roswheels
 		} catch (...)
 		{
 		}
-		ROS_INFO("\033[15;1HBroadcasted Wheel_Status (Dir, Speed, Health): Left[%d, %d, %d] Right[%d, %d, %d]", msg->nLeftWheelDirection, msg->nLeftWheelSpeed, msg->nLeftWheelHealthStatus, msg->nRightWheelDirection, msg->nRightWheelSpeed, msg->nRightWheelHealthStatus);
+		myprintf(_THISFILELINNO, 1, "Broadcasted Wheel_Status (Dir, Speed, Health): Left[%d, %d, %d] Right[%d, %d, %d]", msg->nLeftWheelDirection, msg->nLeftWheelSpeed, msg->nLeftWheelHealthStatus, msg->nRightWheelDirection, msg->nRightWheelSpeed, msg->nRightWheelHealthStatus);
 	}
 	void CWheelStatusConsole::navigator_engine_statusCallback(const wheels::navigator_engine_statusConstPtr& msg)
 	{
@@ -32,7 +33,7 @@ namespace yisys_roswheels
 		} catch (...)
 		{
 		}
-		ROS_INFO("\033[16;1HBroadcasted Navigator_Engine_Status: Active Engine ID= %d [%s]", msg->nActiveEngineID, msg->strActiveEngineDescription.c_str());
+		myprintf(_THISFILELINNO+1, 1, "Broadcasted Navigator_Engine_Status: Active Engine ID= %d [%s]", msg->nActiveEngineID, msg->strActiveEngineDescription.c_str());
 	}
 	void CWheelStatusConsole::wheels_cmd_velCallback(const geometry_msgs::Twist::ConstPtr& msg)
 	{
@@ -42,7 +43,7 @@ namespace yisys_roswheels
 		} catch (...)
 		{
 		}
-		ROS_INFO("\033[17;1Hwheels_cmd_vels: z=%f, x=%f", msg->angular.z, msg->linear.x);
+		myprintf(_THISFILELINNO + 2, 1, "wheels_cmd_vels: z=%3.3f, x=%3.3f", msg->angular.z, msg->linear.x);
 
 	}
 }
