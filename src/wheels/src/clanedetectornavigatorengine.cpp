@@ -320,6 +320,7 @@ void CLaneDetectorNavigatorEngine::ProcessLanes(CvSeq* lines, IplImage* pEdges, 
 	cvPutText(pWorkingImage, szOut, pivotT, &m_Font, CV_RGB(0, 255, 255));
 #endif
 }
+#define ROIRATIO 3
 int32_t CLaneDetectorNavigatorEngine::ProcessImage(IplImage *pFrame, bool bDisplayImage, float &fAngle, CvPoint &vanishingPoint)
 //int32_t CLaneDetectorNavigatorEngine::ProcessFrame(IplImage *pFrame, float &fAngle, CvPoint &vanishingPoint)
 {
@@ -327,7 +328,12 @@ int32_t CLaneDetectorNavigatorEngine::ProcessImage(IplImage *pFrame, bool bDispl
 	double rho = 1;
 	double theta = CV_PI / 180;
 	CvSeq* pLines = NULL;
-
+	double dMedian = 128;
+	double dSigma = 0.33;
+    int32_t canny_T_lower = 0;
+	int32_t canny_T_upper = 255;
+	int32_t nHoughThreshold = 100;
+	int32_t nHoughLines = 0;
 	if (pFrame == NULL)
 	{
 		goto err_out;
@@ -338,9 +344,9 @@ int32_t CLaneDetectorNavigatorEngine::ProcessImage(IplImage *pFrame, bool bDispl
 		m_FrameSize.height = pFrame->height;
 
 		m_HalfFrameSize.width = pFrame->width;
-		m_HalfFrameSize.height = pFrame->height / 2;
+		m_HalfFrameSize.height = pFrame->height / ROIRATIO;
 
-		m_ROI = cvRect(0, m_HalfFrameSize.height, m_HalfFrameSize.width, m_HalfFrameSize.height);
+		m_ROI = cvRect(0, m_FrameSize.height * (ROIRATIO - 1) / ROIRATIO, m_HalfFrameSize.width, m_HalfFrameSize.height);
 	}
 	else
 	{
@@ -375,7 +381,7 @@ int32_t CLaneDetectorNavigatorEngine::ProcessImage(IplImage *pFrame, bool bDispl
 	cvCvtColor(m_pWorkingImage, m_pGreyImage, CV_BGR2GRAY); // convert to grayscale
 
 	// Perform a Gaussian blur ( Convolving with 5 X 5 Gaussian) & detect edges
-	cvSmooth(m_pGreyImage, m_pGreyImage, CV_GAUSSIAN, 5, 5);
+	cvSmooth(m_pGreyImage, m_pGreyImage, CV_GAUSSIAN, 9, 9);
     // till here, it consume 8/30 frame
     {
         CvScalar mu, sigma;
@@ -387,12 +393,15 @@ int32_t CLaneDetectorNavigatorEngine::ProcessImage(IplImage *pFrame, bool bDispl
         //cvCanny(m_pGreyImage, m_pGreyImage, otsu_thresh_val * 0.5, otsu_thresh_val, 3);
     }
 	//cvCanny(m_pGreyImage, m_pEdgesImage, CANNY_MIN_TRESHOLD, CANNY_MAX_TRESHOLD);
-
+	nHoughLines = 0;
+	nHoughThreshold = m_ROI.height * 0.3;
 	// do Hough transform to find lanes
 	pLines = cvHoughLines2(m_pGreyImage, m_pHoughStorage, CV_HOUGH_PROBABILISTIC,
-									rho, theta, HOUGH_TRESHOLD, HOUGH_MIN_LINE_LENGTH, HOUGH_MAX_LINE_GAP);
+									rho, theta, nHoughThreshold,
+                                        m_ROI.height * 0.3,
+                                        HOUGH_MAX_LINE_GAP);
 
-	ProcessLanes(pLines, m_pGreyImage, m_pWorkingImage, m_bShowLine, bDisplayImage);
+	ProcessLanes(pLines, m_pGreyImage, m_pWorkingImage, false, bDisplayImage);
 
 	fAngle = m_fTurnAngle;
 	vanishingPoint = m_VanishingPoint;
@@ -404,7 +413,7 @@ int32_t CLaneDetectorNavigatorEngine::ProcessImage(IplImage *pFrame, bool bDispl
 
         //PublishDebugImage("mono8", m_pGreyImage);
 
-		PublishDebugImage("bgr8", m_pWorkingImage);
+		//PublishDebugImage("bgr8", m_pWorkingImage);
 	}
 	else
 	{

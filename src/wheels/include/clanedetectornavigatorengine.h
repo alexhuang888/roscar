@@ -32,8 +32,8 @@ enum{
     BORDERX = 10,			  // px, skip this much from left & right borders
 	MAX_RESPONSE_DIST = 5,	  // px
 
-	CANNY_MIN_TRESHOLD = 1,	  // edge detector minimum hysteresis threshold
-	CANNY_MAX_TRESHOLD = 100, // edge detector maximum hysteresis threshold
+	CANNY_MIN_TRESHOLD = 30,	  // edge detector minimum hysteresis threshold
+	CANNY_MAX_TRESHOLD = 150, // edge detector maximum hysteresis threshold
 
 	HOUGH_TRESHOLD = 50,		// line approval vote threshold
 	HOUGH_MIN_LINE_LENGTH = 50,	// remove lines shorter than this treshold

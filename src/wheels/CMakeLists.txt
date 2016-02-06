@@ -256,3 +256,11 @@ add_dependencies(wheel_manual_console wheels_generate_messages_cpp)
 # the manual override console of the robot-car, it will listen to cmd_vel and send message to motor controller
 add_executable(testlinefollowing2 src/myutil.cpp src/clinefollowernavigatorengine2.cpp src/cnavigatorenginebase.cpp src/test/testlinefollower2.cpp)
 target_link_libraries(testlinefollowing2 ${catkin_LIBRARIES})
+
+# the manual override console of the robot-car, it will listen to cmd_vel and send message to motor controller
+add_executable(testlanedetector src/myutil.cpp src/clanedetectornavigatorengine.cpp src/cnavigatorenginebase.cpp src/test/testlanedetector.cpp)
+target_link_libraries(testlanedetector ${catkin_LIBRARIES})
+
+# the manual override console of the robot-car, it will listen to cmd_vel and send message to motor controller
+add_executable(testlanedetector2 src/myutil.cpp src/clinefollowernavigatorengine3.cpp src/cnavigatorenginebase.cpp src/test/testlanedetector2.cpp)
+target_link_libraries(testlanedetector2 ${catkin_LIBRARIES})
