@@ -224,42 +224,44 @@ void CLaneDetectorNavigatorEngine::ProcessLanes(CvSeq* lines, IplImage* pEdges, 
 	for (int i = 0; i < lines->total; i++)
     {
         CvPoint* line = (CvPoint*)cvGetSeqElem(lines, i);
-		int dx = line[1].x - line[0].x;
-		int dy = line[1].y - line[0].y;
-		float angle = atan2f(dy, dx) * 180 / CV_PI;
+		CMyLine2DBase _line(line[0], line[1]);
 
-		if (fabs(angle) <= LINE_REJECT_DEGREES)
+		//int dx = line[1].x - line[0].x;
+		//int dy = line[1].y - line[0].y;
+		//float angle = atan2f(dy, dx) * 180 / CV_PI;
+
+		if (fabs(_line.Angle()) >= LINE_REJECT_DEGREES)
 		{ // reject near horizontal lines
 			continue;
 		}
 
 		// assume that vanishing point is close to the image horizontal center
 		// calculate line parameters: y = kx + b;
-		dx = (dx == 0) ? 1 : dx; // prevent DIV/0!
-		float k = dy / (float)dx;
-		float b = line[0].y - k * line[0].x;
+		//dx = (dx == 0) ? 1 : dx; // prevent DIV/0!
+		//float k = dy / (float)dx;
+		//float b = line[0].y - k * line[0].x;
 
 		// assign lane's pLaneStatus based by its midpoint position
 		int midx = (line[0].x + line[1].x) / 2;
 
-		if (midx < pWorkingImage->width / 2)
+		if (midx < pEdges->width / 2)
 		{
-			left.push_back(CLaneInfo(line[0], line[1], angle, k, b));
+			left.push_back(CLaneInfo(line[0], line[1], _line.Angle(), _line.Slope(), _line.B()));//angle, k, b));
 		}
 		else
 		{
-			right.push_back(CLaneInfo(line[0], line[1], angle, k, b));
+			right.push_back(CLaneInfo(line[0], line[1], _line.Angle(), _line.Slope(), _line.B()));//angle, k, b));
 		}
     }
 	if (bShowHoughLine)
 	{
 		// show Hough lines
-		for	(int i=0; i<right.size(); i++)
+		for	(int i = 0; i < right.size(); i++)
 		{
 			cvLine(pWorkingImage, right[i].m_p0, right[i].m_p1, CV_RGB(0, 0, 255), 2);
 		}
 
-		for	(int i=0; i<left.size(); i++)
+		for	(int i = 0; i < left.size(); i++)
 		{
 			cvLine(pWorkingImage, left[i].m_p0, left[i].m_p1, CV_RGB(255, 0, 0), 2);
 		}
@@ -381,7 +383,7 @@ int32_t CLaneDetectorNavigatorEngine::ProcessImage(IplImage *pFrame, bool bDispl
 	cvCvtColor(m_pWorkingImage, m_pGreyImage, CV_BGR2GRAY); // convert to grayscale
 
 	// Perform a Gaussian blur ( Convolving with 5 X 5 Gaussian) & detect edges
-	cvSmooth(m_pGreyImage, m_pGreyImage, CV_GAUSSIAN, 9, 9);
+	cvSmooth(m_pGreyImage, m_pGreyImage, CV_GAUSSIAN, 3, 3);
     // till here, it consume 8/30 frame
     {
         CvScalar mu, sigma;
@@ -399,9 +401,9 @@ int32_t CLaneDetectorNavigatorEngine::ProcessImage(IplImage *pFrame, bool bDispl
 	pLines = cvHoughLines2(m_pGreyImage, m_pHoughStorage, CV_HOUGH_PROBABILISTIC,
 									rho, theta, nHoughThreshold,
                                         m_ROI.height * 0.3,
-                                        HOUGH_MAX_LINE_GAP);
+                                        m_ROI.height * 0.5);
 
-	ProcessLanes(pLines, m_pGreyImage, m_pWorkingImage, false, bDisplayImage);
+	ProcessLanes(pLines, m_pGreyImage, m_pWorkingImage, true, bDisplayImage);
 
 	fAngle = m_fTurnAngle;
 	vanishingPoint = m_VanishingPoint;

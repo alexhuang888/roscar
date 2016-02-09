@@ -65,6 +65,88 @@ public:
 	bool m_visited, m_found;
 	float m_angle, m_k, m_b;
 };
+
+class CMyLine2DBase
+{
+public:
+
+    CMyLine2DBase()
+    {
+        m_bVertical = false;
+    };
+	CMyLine2DBase(cv::Point p1, cv::Point p2)
+	{
+		CvPoint xp1, xp2;
+
+		xp1.x = p1.x;
+		xp1.y = p1.y;
+
+		xp2.x = p2.x;
+		xp2.y = p2.y;
+
+		SetMyLine2DBase(xp1, xp2);
+	}
+
+
+    CMyLine2DBase(CvPoint p1, CvPoint p2)
+    {
+		SetMyLine2DBase(p1, p2);
+    };
+
+    float FindX(float fY)
+    {
+        if (m_bVertical)
+        {
+            return m_Point1.x;
+        }
+        else
+        {
+            return m_Slope != 0 ? (fY - m_B) / m_Slope : 0;
+        }
+        return 0;
+    }
+	float Angle(void) { return m_fAngle; };
+	float Length(void) { return m_fLength; }
+	float Slope(void) { return m_Slope; }
+	float B(void) { return m_B; };
+    CvPoint m_Point1;
+    CvPoint m_Point2;
+    float m_fLength;
+    float m_fAngle;
+    float m_Slope, m_B;
+    bool m_bVertical;
+private:
+	void SetMyLine2DBase(CvPoint p1, CvPoint p2)
+    {
+		m_Point1 = p1;
+		m_Point2 = p2;
+
+		// Compute the line parameters
+		float diffX = p2.x - p1.x;
+		float diffY = p2.y - p1.y;
+
+        if (diffY < 0)
+        {
+            diffX = p1.x - p2.x;
+            diffY = p1.y - p2.y;
+        }
+		if (diffX != 0)
+		{
+			m_Slope = diffY / diffX; // Slope
+			m_B = p1.y - m_Slope * p1.x; // Intercept
+			m_bVertical = false;
+        }
+		else
+		{
+            m_bVertical = true;
+			m_Slope = 0;
+            m_B = p1.y - m_Slope * p1.x; // Intercept
+		}
+
+		m_fLength = sqrt(diffX * diffX + diffY * diffY);
+        m_fAngle = atan2(diffY, diffX) * 180 / CV_PI - 90;
+    };
+};
 };
 
 #endif

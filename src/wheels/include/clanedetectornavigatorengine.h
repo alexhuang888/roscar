@@ -27,7 +27,7 @@ namespace yisys_roswheels
 
 enum{
     SCAN_STEP = 5,			  // in pixels
-	LINE_REJECT_DEGREES = 10, // in degrees
+	LINE_REJECT_DEGREES = 80, // in degrees
     BW_TRESHOLD = 250,		  // edge response strength to recognize for 'WHITE'
     BORDERX = 10,			  // px, skip this much from left & right borders
 	MAX_RESPONSE_DIST = 5,	  // px

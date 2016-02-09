@@ -5,71 +5,24 @@
 #include <opencv2/core/core.hpp>
 #include "AbstractModel.hpp"
 #include "cnavigatorengineimplementationbase.h"
-
+#include "claneinfo.h"
 namespace yisys_roswheels
 {
 
 
 class MyLine2D
-    : public GRANSAC::AbstractParameter
+    : public GRANSAC::AbstractParameter, public CMyLine2DBase
 {
 public:
 
-    MyLine2D()
+    MyLine2D() : CMyLine2DBase()
     {
         m_bVertical = false;
     };
-
-    MyLine2D(CvPoint p1, CvPoint p2)
+   	MyLine2D(CvPoint p1, CvPoint p2) : CMyLine2DBase(p1, p2)
     {
-		m_Point1 = p1;
-		m_Point2 = p2;
-
-		// Compute the line parameters
-		float diffX = p2.x - p1.x;
-		float diffY = p2.y - p1.y;
-
-        if (diffY < 0)
-        {
-            diffX = p1.x - p2.x;
-            diffY = p1.y - p2.y;
-        }
-		if (diffX != 0)
-		{
-			m_Slope = diffY / diffX; // Slope
-			m_B = p1.y - m_Slope * p1.x; // Intercept
-			m_bVertical = false;
-        }
-		else
-		{
-            m_bVertical = true;
-			m_Slope = 0;
-            m_B = p1.y - m_Slope * p1.x; // Intercept
-		}
-
-		m_fLength = sqrt(diffX * diffX + diffY * diffY);
-        m_fAngle = atan2(diffY, diffX) * 180 / CV_PI - 90;
+		m_bVertical = false;
     };
-
-    float FindX(float fY)
-    {
-        if (m_bVertical)
-        {
-            return m_Point1.x;
-        }
-        else
-        {
-            return m_Slope != 0 ? (fY - m_B) / m_Slope : 0;
-        }
-        return 0;
-    }
-
-    CvPoint m_Point1;
-    CvPoint m_Point2;
-    float m_fLength;
-    float m_fAngle;
-    float m_Slope, m_B;
-    bool m_bVertical;
 };
 
 class MyLine2DModel
