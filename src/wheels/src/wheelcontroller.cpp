@@ -11,7 +11,6 @@ namespace yisys_roswheels
 {
 
 CWheelController::CWheelController(std::string name) : 
-    //m_ActionServer(m_nNodeHandle, name, boost::bind(&CWheelController::executeCB, this, _1), false),
     m_ActionServer(m_nNodeHandle, name, false),
     m_strAction_Name(name)
 {
@@ -28,9 +27,6 @@ CWheelController::CWheelController(std::string name) :
     //register the goal and feeback callbacks
     m_ActionServer.registerGoalCallback(boost::bind(&CWheelController::goalCB, this));
     m_ActionServer.registerPreemptCallback(boost::bind(&CWheelController::preemptCB, this));
-
-
-    //m_ActionServer.start();
     
 	m_WheelStatusPublisher = m_nNodeHandle.advertise<wheels::wheels_status>("wheels_status", 1000);
 
@@ -56,7 +52,6 @@ void CWheelController::PublishWheelsStatus(void)
 	{
 		m_pGlobalCarController->GetWheelStatus(CMC_LEFTWHEELID, status.nLeftWheelDirection, status.nLeftWheelSpeed, status.nLeftWheelHealthStatus);
 		m_pGlobalCarController->GetWheelStatus(CMC_RIGHTWHEELID, status.nRightWheelDirection, status.nRightWheelSpeed, status.nRightWheelHealthStatus);
-		//ROS_INFO("Left[%d, %d, %d] Right[%d, %d, %d]", status.nLeftWheelDirection, status.nLeftWheelSpeed, status.nLeftWheelHealthStatus, status.nRightWheelDirection, status.nRightWheelSpeed, status.nRightWheelHealthStatus);
 	}	
 	/**
 	* The publish() function is how you send messages. The parameter
@@ -100,9 +95,6 @@ int32_t CWheelController::cbSetDirectionAndSpeed(uint32_t nNewDirection, uint32_
 				nRetCode = m_pGlobalCarController->TurnLeft(nNewSpeed, CMC_MOTORBACKWARD);
 			break;			
 		}
-		//ROS_INFO("new request: direction=%d, speed=%d", nNewDirection, nNewSpeed);
-		//PublishWheelsStatus();
-		//ROS_INFO("sending back response: Code[%d], lastdirection=%d, lastspeed=%d", res.nRetCode, res.nLastDirection, res.nLastSpeed);
 	}
 	return nRetCode;		
 }
@@ -116,8 +108,6 @@ bool CWheelController::cbSetDirectionAndSpeed(wheels::cmd_set_car_direction_spee
 		m_pGlobalCarController->GetDirectionSpeed(res.nLastDirection, res.nLastSpeed);
 		res.nRetCode = cbSetDirectionAndSpeed(req.nNewDirection, req.nNewSpeed);
 		m_pGlobalCarController->GetDirectionSpeed(res.nNewDirection, res.nNewSpeed);
-		//ROS_INFO("new request: direction=%d, speed=%d", req.nNewDirection, req.nNewSpeed);
-		//ROS_INFO("sending back response: Code[%d], lastdirection=%d, lastspeed=%d", res.nRetCode, res.nLastDirection, res.nLastSpeed);
 		return true;
 	}
 	return false;		
@@ -136,8 +126,6 @@ bool CWheelController::cbSetTwoWheelsDirectionAndSpeed(wheels::cmd_set_car_two_w
 		
 		m_pGlobalCarController->GetWheelStatus(CMC_LEFTWHEELID, res.nNewLeftDirection, res.nNewLeftSpeed, nHealthStatus);
 		m_pGlobalCarController->GetWheelStatus(CMC_RIGHTWHEELID, res.nNewRightDirection, res.nNewRightSpeed, nHealthStatus);
-		//ROS_INFO("new request: direction=%d, speed=%d", req.nNewDirection, req.nNewSpeed);
-		//ROS_INFO("sending back response: Code[%d], lastdirection=%d, lastspeed=%d", res.nRetCode, res.nLastDirection, res.nLastSpeed);
 		return true;
 	}
 	return false;		
@@ -148,9 +136,6 @@ bool CWheelController::cbGetOneWheelStatus(wheels::cmd_get_one_wheel_statusReque
 	if (m_pGlobalCarController != NULL)
 	{
 		res.nRetCode = m_pGlobalCarController->GetWheelStatus(req.nWheelID, res.nWheelDirection, res.nWheelSpeed, res.nWheelHealthStatus);
-		
-		//ROS_INFO("request: wheelID=%d", req.nWheelID);
-		//ROS_INFO("sending back response: RetCode=%d, WheelDirection=%d, wheel Speed=%d wheel healthStatus=%d", res.nRetCode, res.nWheelDirection, res.nWheelSpeed, res.nWheelHealthStatus);
 		return true;
 	}
 	return false;

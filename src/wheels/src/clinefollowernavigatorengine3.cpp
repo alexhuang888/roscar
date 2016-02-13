@@ -85,7 +85,7 @@ void CLineFollowerNavigatorEngine3::ProcessLanes(CvSeq* lines, IplImage* pEdges,
 
         if (fabs(myline.m_fAngle) < 80) // almost horizontal line
         {
-            m_fTurnAngle = myline.m_fAngle;//90 - atan2(line[1].y - line[0].y, line[1].x - line[0].x) * 180 / CV_PI;
+            m_fTurnAngle = myline.m_fAngle;
             m_VanishingPoint.x = (myline.m_Point1.x + myline.m_Point2.x) / 2;
             m_VanishingPoint.y = (myline.m_Point1.y + myline.m_Point2.y) / 2;
 
@@ -311,25 +311,19 @@ int32_t CLineFollowerNavigatorEngine3::ProcessImage(IplImage *pFrame, bool bDisp
 	// we're interested only in road below horizont - so crop top image portion off
 	crop(pFrame, m_pWorkingImage, m_ROI);
 	cvCvtColor(m_pWorkingImage, m_pGreyImage, CV_BGR2GRAY); // convert to grayscale
-
 	// Perform a Gaussian blur ( Convolving with 3 X 3 Gaussian) & detect edges
 	cvSmooth(m_pGreyImage, m_pGreyImage, CV_GAUSSIAN, 9, 9);    // 25/30 (CV_MEDIA=15/30, CV_BLUR=22/30)
     // till here, it consume 8/30 frame
     {
         CvScalar mu, sigma;
         cvAvgSdv(m_pGreyImage, &mu, &sigma);
-        //double otsu_thresh_val = cvThreshold(m_pGreyImage, m_pOTSU, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
-
-        //cvCanny(m_pGreyImage, m_pGreyImage, L2_CANNY_MIN_TRESHOLD, L2_CANNY_MAX_TRESHOLD, 3);  // 15/30 (src=dest is faster 17/30)
         cvCanny(m_pGreyImage, m_pGreyImage, mu.val[0] - sigma.val[0], mu.val[0] + sigma.val[0], 3);  // 15/30 (src=dest is faster 17/30)
-        //cvCanny(m_pGreyImage, m_pGreyImage, otsu_thresh_val * 0.5, otsu_thresh_val, 3);
     }
 	// do Hough transform to find lines
     // till here, it consume 15/30 frame
 	nHoughLines = 0;
 	nHoughThreshold = m_ROIFrameSize.height * 0.4;
 
-	//while (nHoughLines < 5 && nHoughThreshold > 4)
 	{
         // 6.5/30
         pLines = cvHoughLines2(m_pGreyImage, m_pHoughStorage, CV_HOUGH_PROBABILISTIC,

@@ -176,6 +176,16 @@ void CWheelDriver::_ResetPIDParams(void)
     m_fAccumulatedShiftError = 0;
     m_bPIDReset = true;
 }
+/*
+PID controller: input is angle, and output is adjusted angle.
+how should I map this adjusted angle back to differential wheel speed?
+
+The idea is: we should plan our path first, then define a navigation plan. (turn x degree in t1 second, 
+go straight in t2 seconds, turn y degree in t3 seconds.)
+
+For each "action" in a navigation plan, we have to calcualte the speed of each wheels.
+Then, feed the calculated speed of each wheel to its PID controllers.
+*/
 int32_t CWheelDriver::CmdVelToWheelController(float fAngular, float fLinear)
 {
 	int32_t nRet = 0;

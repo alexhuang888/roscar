@@ -27,7 +27,7 @@ int main(int argc, char **argv)
 	wheels::cmd_send_manual_instruction srv;
 	
 	uint32_t nInput = 0;
-	//printf("Input instruction (0: disable all navigator engine, 1: line-follower, o: manual stop, k: manual restart, u: forward, d: backward, l: left, r: right, w: right-backward, z: left-backward, p: stop, i: wheel status\n");
+
 	while ((nInput = mygetch()) != 27)
 	{
 		srv.request.nManualInstruction = nInput;

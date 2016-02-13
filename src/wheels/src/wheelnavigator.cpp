@@ -10,7 +10,6 @@ namespace yisys_roswheels
 CWheelNavigator::CWheelNavigator() : m_ImageTransport(m_nNodeHandle)
 {
 	m_ActiveEngineID = 0;
-	//m_pTrackingEngine = NULL;
 
 	m_EngineStatusPublisher = m_nNodeHandle.advertise<wheels::navigator_engine_status>("navigator_engine_status", 1000);
 
@@ -79,13 +78,11 @@ int32_t CWheelNavigator::SetTrackingEngine(uint32_t nEngineID)
 {
 	int32_t nRet = 0;
     CNavigatorEngineImplementationBase *pNavImpPtr = NULL;
-	//if (m_pTrackingEngine != NULL)
+
 	{
 		m_TrackingEngine.Pause();
 	}
 	m_ActiveEngineID = 0;
-	//m_pTrackingEngine = NULL;
-
 
 	if (m_EnginePool.find(nEngineID) == m_EnginePool.end())
 	{
@@ -95,7 +92,6 @@ int32_t CWheelNavigator::SetTrackingEngine(uint32_t nEngineID)
 
 	m_TrackingEngine.SetNavEngineImplementation(pNavImpPtr);
 	m_ActiveEngineID = pNavImpPtr->GetEngineID();
-	//if (m_pTrackingEngine != NULL)
 	{
 		m_TrackingEngine.Start();
 	}
@@ -115,18 +111,16 @@ bool CWheelNavigator::cbSetEngine(wheels::cmd_set_navigator_engineRequest &req,
 									wheels::cmd_set_navigator_engineResponse &res)
 {
 	res.nLastEngineID = m_ActiveEngineID;
-	//if (m_pTrackingEngine != NULL)
-		res.strLastEngineDescription = m_TrackingEngine.GetEngineDescription();
-	//else
-		//res.strLastEngineDescription = "";
+
+	res.strLastEngineDescription = m_TrackingEngine.GetEngineDescription();
+
+
 	res.nRetCode = SetTrackingEngine(req.nNewEngineID);
 	if (res.nRetCode > 0)
 	{
 		res.nActiveEngineID = req.nNewEngineID;
-		//if (m_pTrackingEngine != NULL)
-			res.strActiveEngineDescription = m_TrackingEngine.GetEngineDescription();
-		//else
-		//	res.strActiveEngineDescription = "";
+
+		res.strActiveEngineDescription = m_TrackingEngine.GetEngineDescription();
 	}
 	return true;
 }
@@ -144,10 +138,9 @@ bool CWheelNavigator::cbGetEngineStatus(wheels::cmd_get_navigator_engine_statusR
 										wheels::cmd_get_navigator_engine_statusResponse &res)
 {
 	res.nActiveEngineID = m_ActiveEngineID;
-	//if (m_pTrackingEngine != NULL)
-		res.strActiveEngineDescription = m_TrackingEngine.GetEngineDescription();
-	//else
-	//	res.strActiveEngineDescription = "";
+
+	res.strActiveEngineDescription = m_TrackingEngine.GetEngineDescription();
+
 	res.nRetCode = 1;
 
 	return true;
@@ -158,17 +151,14 @@ void CWheelNavigator::PublishEngineStatus(void)
 	wheels::navigator_engine_status status;
 
 	status.nActiveEngineID = m_ActiveEngineID;
-	//if (m_pTrackingEngine != NULL)
-		status.strActiveEngineDescription = m_TrackingEngine.GetEngineDescription();
-	//else
-		//status.strActiveEngineDescription = "";
+
+	status.strActiveEngineDescription = m_TrackingEngine.GetEngineDescription();
 
 	m_EngineStatusPublisher.publish(status);
 }
 
 int32_t CWheelNavigator::ProcessCmdVels(const geometry_msgs::Twist &velMsg)
 {
-	//printf("Navigator publish: z=%f, x=%f\n", velMsg.angular.z, velMsg.linear.x);
 	m_WheelCmdVelPublisher.publish(velMsg);
 	return 1;
 }

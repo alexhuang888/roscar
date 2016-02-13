@@ -17,7 +17,6 @@ namespace yisys_roswheels
 {
 int32_t CNavigatorEngineBase::PublishDebugImage(std::string encoding, cv::Mat image)
 {
-    //if (pImage != NULL)
     {
         sensor_msgs::ImagePtr imgmsg = cv_bridge::CvImage(std_msgs::Header(), encoding, image).toImageMsg();
         return PublishDebugImage(imgmsg);
@@ -34,14 +33,8 @@ CNavigatorEngineWithImageSource::CNavigatorEngineWithImageSource()
 
 	m_VidSubscriber = m_nImageBaseNodeHandle.subscribe(m_strVidChannel, 1, &CNavigatorEngineWithImageSource::vidCb, this);
 
-
-	// wait for cam calib
 	m_nWidth = m_nHeight = 0;
 
-	// imagebuffer
-	//m_pImageBuffer = new NotifyBuffer<TimestampedMat>(8);
-	//m_pUndistorter = NULL;
-	//m_nLastSEQ = 0;
 
 	m_bHaveCalibration = false;
 
@@ -52,10 +45,6 @@ CNavigatorEngineWithImageSource::CNavigatorEngineWithImageSource()
 
 CNavigatorEngineWithImageSource::~CNavigatorEngineWithImageSource()
 {
-	//if (m_pUndistorter != NULL)
-	//	delete m_pUndistorter;
-	//m_pUndistorter = NULL;
-
 	m_pNavEngineImpl = NULL;
 }
 
@@ -156,7 +145,6 @@ int32_t CNavigatorEngineWithImageSource::ProcessImageData(const sensor_msgs::Ima
 		myprintf(_ERRORLINENO, 1, "Fail to ProcessImage\n");
 		goto err_out;
 	}
-	//printf("Lane center: fAngle=%f, center(%d, %d)\n", fAngle, vanishPoint.x, vanishPoint.y);
 
 	fAngleRatio = fAngle / 90.f;
 #if 0
@@ -232,7 +220,7 @@ void CNavigatorEngineWithImageSource::vidCb(const sensor_msgs::ImageConstPtr img
 	bool bDisplayImage = false;
 
 	m_nImageBaseNodeHandle.param<bool>(WGP_DEBUG_SHOWIMAGE, bDisplayImage, false);
-	//printf("Show Debug Image=%s\n", bDisplayImage ? "Yes" : "No");
+
 	ProcessImageData(img, bDisplayImage);
 #if 1
 	{

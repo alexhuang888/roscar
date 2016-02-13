@@ -226,20 +226,10 @@ void CLaneDetectorNavigatorEngine::ProcessLanes(CvSeq* lines, IplImage* pEdges, 
         CvPoint* line = (CvPoint*)cvGetSeqElem(lines, i);
 		CMyLine2DBase _line(line[0], line[1]);
 
-		//int dx = line[1].x - line[0].x;
-		//int dy = line[1].y - line[0].y;
-		//float angle = atan2f(dy, dx) * 180 / CV_PI;
-
 		if (fabs(_line.Angle()) >= LINE_REJECT_DEGREES)
 		{ // reject near horizontal lines
 			continue;
 		}
-
-		// assume that vanishing point is close to the image horizontal center
-		// calculate line parameters: y = kx + b;
-		//dx = (dx == 0) ? 1 : dx; // prevent DIV/0!
-		//float k = dy / (float)dx;
-		//float b = line[0].y - k * line[0].x;
 
 		// assign lane's pLaneStatus based by its midpoint position
 		int midx = (line[0].x + line[1].x) / 2;
@@ -291,7 +281,6 @@ void CLaneDetectorNavigatorEngine::ProcessLanes(CvSeq* lines, IplImage* pEdges, 
 		cvLine(pWorkingImage, lt, rt, CV_RGB(128, 0, 128), 2);
 		cvLine(pWorkingImage, lb, rb, CV_RGB(128, 0, 128), 2);
 	}
-	//CvPoint vanishingPoint;
 
 	m_VanishingPoint.x = -(m_LaneR.b.get() - m_LaneL.b.get()) / (m_LaneR.k.get() - m_LaneL.k.get());	// x coordinate
 	m_VanishingPoint.y = m_LaneR.k.get() * m_VanishingPoint.x + m_LaneR.b.get();
@@ -324,7 +313,6 @@ void CLaneDetectorNavigatorEngine::ProcessLanes(CvSeq* lines, IplImage* pEdges, 
 }
 #define ROIRATIO 3
 int32_t CLaneDetectorNavigatorEngine::ProcessImage(IplImage *pFrame, bool bDisplayImage, float &fAngle, CvPoint &vanishingPoint)
-//int32_t CLaneDetectorNavigatorEngine::ProcessFrame(IplImage *pFrame, float &fAngle, CvPoint &vanishingPoint)
 {
 	int32_t nRet = -1;
 	double rho = 1;
@@ -388,13 +376,9 @@ int32_t CLaneDetectorNavigatorEngine::ProcessImage(IplImage *pFrame, bool bDispl
     {
         CvScalar mu, sigma;
         cvAvgSdv(m_pGreyImage, &mu, &sigma);
-        //double otsu_thresh_val = cvThreshold(m_pGreyImage, m_pOTSU, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
-
-        //cvCanny(m_pGreyImage, m_pGreyImage, L2_CANNY_MIN_TRESHOLD, L2_CANNY_MAX_TRESHOLD, 3);  // 15/30 (src=dest is faster 17/30)
         cvCanny(m_pGreyImage, m_pGreyImage, mu.val[0] - sigma.val[0], mu.val[0] + sigma.val[0], 3);  // 15/30 (src=dest is faster 17/30)
-        //cvCanny(m_pGreyImage, m_pGreyImage, otsu_thresh_val * 0.5, otsu_thresh_val, 3);
     }
-	//cvCanny(m_pGreyImage, m_pEdgesImage, CANNY_MIN_TRESHOLD, CANNY_MAX_TRESHOLD);
+
 	nHoughLines = 0;
 	nHoughThreshold = m_ROI.height * 0.3;
 	// do Hough transform to find lanes

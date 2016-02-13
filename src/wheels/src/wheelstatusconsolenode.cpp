@@ -7,14 +7,7 @@ int main(int argc, char **argv)
 
 	yisys_roswheels::CWheelStatusConsole console;
 	ros::spin();
-	/*
-	ros::Rate loop_rate(10);
-	while (ros::ok())
-	{
-		ros::spinOnce();
-		loop_rate.sleep();
-	}
-	*/
+
 	myclearscreen();
 	return 1;
 }
