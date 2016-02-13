@@ -9,11 +9,9 @@ Build codes:
 3. You need to install wiringPi.
 4. This project folder is a full catkn workspace (not just a package.) You can get this respository, then <br/>
 type <br/>
-cd ~/roscar <br/>
-
+    cd ~/roscar <br/>
 then type <br/>
-catkin_make <br/>
-
+    catkin_make <br/>
 5. In case you just need the ROS package, it is under "roscar/src/wheels" folder.
 
 mail me yisystemsinc@gmail.com if you have any questions.
